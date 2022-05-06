@@ -1,0 +1,57 @@
+np_seed = 20922295
+5 points. 
+    N. + emp + opt: 3.71e-02 (±1.41e-02), 2.37e-02s, 0 fails
+    Nyström: 4.14e-02 (±1.22e-02), 2.39e-02s, 0 fails
+    Nyström + opt: 3.07e-02 (±9.13e-03), 4.99e-02s, 0 fails
+    FNE: 7.41e-02 (±2.89e-02), 2.64e-03s, 0 fails
+    FNE + opt: 3.61e-02 (±1.30e-02), 1.55e-02s, 0 fails
+    iid Bayes: 5.89e-02 (±3.15e-02), 1.08e-02s, 0 fails
+10 points. 
+    N. + emp + opt: 7.92e-03 (±2.53e-03), 5.00e-02s, 0 fails
+    Nyström: 8.12e-03 (±2.48e-03), 2.51e-02s, 0 fails
+    Nyström + opt: 5.90e-03 (±1.51e-03), 4.99e-02s, 0 fails
+    FNE: 1.71e-02 (±4.85e-03), 5.32e-03s, 0 fails
+    FNE + opt: 8.53e-03 (±3.04e-03), 2.48e-02s, 0 fails
+    iid Bayes: 2.03e-02 (±1.09e-02), 1.11e-02s, 0 fails
+20 points. 
+    N. + emp + opt: 1.35e-03 (±3.52e-04), 4.97e-02s, 0 fails
+    Nyström: 1.58e-03 (±3.47e-04), 4.54e-02s, 0 fails
+    Nyström + opt: 1.24e-03 (±2.65e-04), 5.07e-02s, 0 fails
+    FNE: 3.32e-03 (±8.71e-04), 1.40e-02s, 0 fails
+    FNE + opt: 1.41e-03 (±3.61e-04), 4.99e-02s, 0 fails
+    iid Bayes: 5.12e-03 (±2.60e-03), 1.52e-02s, 0 fails
+40 points. 
+    N. + emp + opt: 1.71e-04 (±3.55e-05), 1.50e-01s, 0 fails
+    Nyström: 2.29e-04 (±4.83e-05), 1.50e-01s, 0 fails
+    Nyström + opt: 1.71e-04 (±2.96e-05), 2.00e-01s, 0 fails
+    FNE: 5.72e-04 (±2.00e-04), 5.15e-02s, 0 fails
+    FNE + opt: 1.72e-04 (±3.21e-05), 6.85e-02s, 0 fails
+    iid Bayes: 9.97e-04 (±3.94e-04), 2.42e-02s, 0 fails
+60 points. 
+    N. + emp + opt: 4.24e-05 (±7.81e-06), 4.00e-01s, 0 fails
+    Nyström: 6.17e-05 (±9.79e-06), 3.12e-01s, 0 fails
+    Nyström + opt: 5.08e-05 (±1.02e-05), 3.50e-01s, 0 fails
+    FNE: 2.21e-04 (±9.26e-05), 1.59e-01s, 0 fails
+    FNE + opt: 4.45e-05 (±9.50e-06), 2.00e-01s, 0 fails
+    iid Bayes: 3.53e-04 (±1.51e-04), 2.50e-02s, 0 fails
+80 points. 
+    N. + emp + opt: 1.39e-05 (±2.64e-06), 9.76e-01s, 0 fails
+    Nyström: 2.10e-05 (±3.19e-06), 6.31e-01s, 0 fails
+    Nyström + opt: 1.78e-05 (±2.45e-06), 6.57e-01s, 0 fails
+    FNE: 1.23e-04 (±6.59e-05), 3.20e-01s, 0 fails
+    FNE + opt: 1.53e-05 (±2.82e-06), 3.51e-01s, 0 fails
+    iid Bayes: 1.72e-04 (±5.90e-05), 4.02e-02s, 0 fails
+120 points. 
+    N. + emp + opt: 2.86e-06 (±3.40e-07), 3.81e+00s, 0 fails
+    Nyström: 4.47e-06 (±7.25e-07), 1.70e+00s, 0 fails
+    Nyström + opt: 3.68e-06 (±4.60e-07), 1.71e+00s, 0 fails
+    FNE: 4.79e-05 (±2.32e-05), 8.97e-01s, 0 fails
+    FNE + opt: 2.97e-06 (±3.66e-07), 9.51e-01s, 0 fails
+    iid Bayes: 6.08e-05 (±2.97e-05), 5.00e-02s, 0 fails
+160 points. 
+    N. + emp + opt: 8.21e-07 (±1.18e-07), 1.28e+01s, 0 fails
+    Nyström: 1.72e-06 (±2.26e-07), 4.91e+00s, 0 fails
+    Nyström + opt: 1.25e-06 (±1.97e-07), 5.00e+00s, 0 fails
+    FNE: 2.72e-05 (±1.35e-05), 2.05e+00s, 0 fails
+    FNE + opt: 7.79e-07 (±1.14e-07), 2.09e+00s, 0 fails
+    iid Bayes: 2.41e-05 (±8.13e-06), 5.01e-02s, 0 fails
