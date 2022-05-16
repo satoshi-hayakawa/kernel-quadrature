@@ -1,4 +1,4 @@
-# This repository containds the code used in the paper "Positively Weighted Kernel Quadrature via Subsampling" (https://arxiv.org/abs/2107.09597v3)
+# This repository contains the code used in the paper "Positively Weighted Kernel Quadrature via Subsampling" (https://arxiv.org/abs/2107.09597v3)
 
 ## Python Files
 The python files are written for Pyhon3 and require Gurobi Optimizer (https://www.gurobi.com/). They are divided into three categroires:
@@ -9,8 +9,8 @@ The python files are written for Pyhon3 and require Gurobi Optimizer (https://ww
   - `grlp.py` provides LP and CQP functions suitable for using the Gurobi optimizer in our setting.
 - Files starting from `experiment` directly run the experiments done in the paper. 
   - `experiment_sobolev.py` and `experiment_data.py` respectively give experiments done in Section 3.1 and 3.2.
-  - `experiment_rchq_sobolev.py` and `experimet_rchq_data.py` respectively give experimets done in Section E.1 and E.2.
-- The other python files are providing the details of expriments and called in files starting from `experiment`.
+  - `experiment_rchq_sobolev.py` and `experimet_rchq_data.py` respectively give experiments done in Section E.1 and E.2.
+- The other python files are providing the details of experiments and called in files starting from `experiment`.
 
 ## Results Folders
 The folders `/results` and `/results_rchq` respectively contain files used in Section 3 and E.
@@ -20,7 +20,7 @@ In both folders, you will find there are two different types of filenames:
 Text files provide the average squared worst-case error, its sample standard deviation, and average runtime for each method.
 Note that due to the log plot in y-axis, when making the corresponding graphs, we are taking the average and standard deviation of their logarithms, so the values in the text files are not directly used in plotting the results.
 
-- `{3Dnet,PPlant}_Gaussian_t50.{pdf,txt}` provide results for the correponding ML datasets. In our code we also have the rational quadratic function `RatQuad` as another option than `Gaussian`, but this case is not included in the paper. The description of text files are the same as that of periodic Sobolev spaces.
+- `{3Dnet,PPlant}_Gaussian_t50.{pdf,txt}` provide results for the corresponding ML datasets. In our code we also have the rational quadratic function `RatQuad` as another option than `Gaussian`, but this case is not included in the paper. The description of text files are the same as that of periodic Sobolev spaces.
 
 ## ML Datasets: download needed!
 To run the experiments on measure reduction in ML datasets, you need to download the datasets from UCI Machine Learning Repository and add them in `/data` folder with the following filenames.
