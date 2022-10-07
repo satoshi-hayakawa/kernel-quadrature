@@ -18,15 +18,18 @@ data_t_out = 0
 k_exp_ = 0
 k_exp_exp_ = 0
 
+k_exp_test_ = 0
+k_exp_exp_test_ = 0
+
 
 def gen_params(n):
     return np.random.randint(num, size=n)
 
 
-def preprocess(data_name):
+def preprocess(data_name, data_split=False):
     # read data
     global data, data_test, data_t_out
-    if data_name == '3Dnet':
+    if data_name == '3Dnet':  # or 'PPlant'
         data_read = np.loadtxt('data/3D_spatial_network.txt',
                                delimiter=',', usecols=(1, 2, 3))
     else:
@@ -38,9 +41,23 @@ def preprocess(data_name):
     print(num)
     if data_name == '3Dnet':
         num = num // 10
-    data = data_read[:num, :]
+    elif data_split:
+        num = num // 2
+    data = data_read[:num, :].copy()
+
+    d_m = [np.mean(data[:, i]) for i in range(dim)]
+    d_s = [np.std(data[:, i]) for i in range(dim)]
+
     for i in range(dim):
-        data[:, i] = (data[:, i] - np.mean(data[:, i])) / np.std(data[:, i])
+        data[:, i] = (data[:, i] - d_m[i]) / d_s[i]
+        #data[:, i] = (data[:, i] - np.mean(data[:, i])) / np.std(data[:, i])
+
+    if data_split:
+        data_test = data_read[:2*num, :].copy()
+        for i in range(dim):
+            data_test[:, i] = (data_test[:, i] - d_m[i]) / d_s[i]
+        # adding the same normalization to the test data
+
     #data_test = data[:, dim-1:dim].reshape((num,))
     #data_t_out = data_test * (data[:, 0:1] >= 0).reshape((num,))
     #data_t_out = data_t_out * (data[:, 1:2] >= 0).reshape((num,))
@@ -48,6 +65,9 @@ def preprocess(data_name):
     lam = median_heuristics()
     k_exp_comp()
     k_exp_exp_comp()
+    if data_split:
+        k_exp_comp_test()
+        k_exp_exp_comp_test()
 
 
 def k(x, y=0, diag=False, data_k=None, lam_k=None, kernel=None):
@@ -75,14 +95,15 @@ def experiments(
     data_name='3Dnet',
     kernel='Gaussian',
     times=20,
-    np_seed=None
+    np_seed=None,
+    data_split=False
 ):
     np.random.seed(np_seed)
-    preprocess(data_name)
+    preprocess(data_name, data_split)
     enys.k = functools.partial(k, data_k=data, lam_k=lam, kernel=kernel)
 
-    text_data = open("results/{}_{}_t{}.txt".format(
-        data_name, kernel, times), 'w', encoding='utf-8')
+    text_data = open("results/{}_{}_t{}.txt".format(data_name, kernel, times), 'w', encoding='utf-8') if not data_split else open(
+        "results/{}_{}_t{}_split.txt".format(data_name, kernel, times), 'w', encoding='utf-8')
     print("np_seed = {}".format(np_seed), file=text_data)
 
     fig = plt.figure()
@@ -102,7 +123,8 @@ def experiments(
             res = np.zeros(times)
             for j in range(times):
                 points, weights = func(m_names[i], n, rec=n*n, nys=10*n)
-                res[j] = eval(points, weights)
+                res[j] = eval(points, weights) if not data_split else eval_test(
+                    points, weights)
             end_time = time.perf_counter()
             elapsed = (end_time - start_time)/times
             res_sq = np.std(res)
@@ -127,7 +149,11 @@ def experiments(
     plt.ylabel("$\mathrm{log}_{10} (\mathrm{wce})^2$", fontsize=20)
     plt.tight_layout()
     # plt.show()
-    fig.savefig("results/{}_{}_t{}.pdf".format(data_name, kernel, times))
+    if not data_split:
+        fig.savefig("results/{}_{}_t{}.pdf".format(data_name, kernel, times))
+    else:
+        fig.savefig(
+            "results/{}_{}_t{}_split.pdf".format(data_name, kernel, times))
     text_data.close()
 
 
@@ -246,3 +272,41 @@ def ktpp(n, rec):
     coreset = thin_pp.main(X, lsize, lam)  # thin_pp
     m = len(coreset)
     return idx[coreset], np.ones(m) / m
+
+# below is for the MMD comparison with another set of empirical data
+# using copy & paste to minimize the change to the original version of the code..
+
+
+def k_exp_exp_test():
+    return k_exp_exp_test_
+
+
+def k_exp_exp_comp_test():  # post computation
+    global k_exp_exp_test_
+    k_exp_exp_test_ = np.sum(k_exp_test_[-num:]) / num
+
+
+def k_exp_test(x):
+    return k_exp_test_[x]
+
+
+def k_exp_comp_test():  # post computation
+    r = np.ones((num,))
+    r /= num
+    x_test = np.arange(num, 2*num)
+    xal = np.arange(2*num)
+    xsp = np.array_split(xal, np.minimum(50, len(xal)))
+    dots = [k(x, x_test, data_k=data_test) @ r for x in xsp]
+    global k_exp_test_
+    k_exp_test_ = np.concatenate(dots)
+
+
+def eval_test(x, w, pr=False):
+    if pr == True:
+        print(w)
+    if len(x) == 0:
+        return 10000000000
+    m = len(x)
+    tmp = np.transpose(w) @ k_exp_test(x)
+    ret = (k_exp_exp_test() - tmp) + (np.transpose(w) @ k(x, x) @ w - tmp)
+    return ret
