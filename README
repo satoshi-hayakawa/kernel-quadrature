@@ -1,0 +1,81 @@
+# This repository contains the code used in the paper "Positively Weighted Kernel Quadrature via Subsampling"
+
+## Python Files
+The python files are written for Pyhon3 and require Gurobi Optimizer (https://www.gurobi.com/) and GoodPoints package (https://github.com/microsoft/goodpoints). They are divided into three categories:
+
+- `emp_nys.py`, `emp_mer.py`, `grlp.py`, `thinning.py`, `thin_pp.py` are libraries.
+  - `emp_nys.py` provides our main contribution: recombination algorithm with a kernel given by Nyström approximation. You can change the kernel `emp_nys.k` to use it for your own problem. Further tutorials will be added in due course.
+  - `emp_mer.py` is using the trigonometric functions, but you can pass it the known eigenvalues/functions of your own problem.
+  - `grlp.py` provides LP and CQP functions suitable for using the Gurobi optimizer in our setting.
+  - `thinning.py` and `thin_pp.py` provide kernel thinning and its acceleration by using the GoodPoints package.
+- Files starting from `experiment` directly run the experiments done in the paper. 
+  - `experiment_sobolev.py` and `experiment_data.py` respectively give experiments done in Section 3.1 and 3.2.
+  - `experiment_rchq_sobolev.py` and `experimet_rchq_data.py` respectively give experiments done in Section E.1 and E.2.
+- The other python files are providing the details of experiments and called in files starting from `experiment`.
+
+## Results Folders
+The folders `/results` and `/results_rchq` respectively contain files used in Section 3 and E.
+In both folders, you will find there are two different types of filenames:
+
+- `d*s*t20.{pdf,txt}` provide results on periodic Sobolev spaces. The filenames show the dimension, smoothness, and the number of trials for each method in this order. The last value is 20 for all the experiments done in the paper, but you can edit `experiment_*.py` to do faster experiments with smaller `t` values.
+Text files provide the average squared worst-case error, its sample standard deviation, and average runtime for each method.
+Note that due to the log plot in y-axis, when making the corresponding graphs, we are taking the average and standard deviation of their logarithms, so the values in the text files are not directly used in plotting the results.
+
+- `{3Dnet,PPlant}_Gaussian_t20.{pdf,txt}` provide results for the corresponding ML datasets. In our code we also have the rational quadratic function `RatQuad` as another option than `Gaussian`, but this case is not included in the paper. The description of text files are the same as that of periodic Sobolev spaces.
+
+## ML Datasets: download needed!
+To run the experiments on measure reduction in ML datasets, you need to download the datasets from UCI Machine Learning Repository and add them in `/data` folder with the following filenames.
+- `3D_spatial_network.txt` from https://archive.ics.uci.edu/ml/machine-learning-databases/00246/.
+- `Combined Cycle Power Plant Data Set.txt` from https://archive.ics.uci.edu/ml/machine-learning-databases/00294/.
+  - Extract `CCPP.zip` and find `Folds5x2_pp.xlsx`. Then make a named text file using the numbers from `A2` to `E9569` in its sheet 5 using comma separation in each line.
+
+## License
+Our code includes some modification of the code `recombination.py` written by Cossentino et al. (2020):
+- Cosentino, F., Oberhauser, H., & Abate, A. (2020). A randomized algorithm to reduce the support of discrete measures. Advances in Neural Information Processing Systems, 33, 15100-15110.
+- Code available at https://github.com/FraCose/Recombination_Random_Algos/blob/master/recombination.py.
+
+The cited asset is licensed under the following MIT License:
+
+Copyright (c) 2020 Francesco Cosentino, Harald Oberhauser, Alessandro Abate
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Our code also includes a modification of example files found at https://github.com/microsoft/goodpoints/tree/main/examples.
+
+The cited asset is licensed under the following MIT License:
+
+Copyright (c) Microsoft Corporation.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE

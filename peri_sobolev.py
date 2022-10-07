@@ -9,6 +9,8 @@ import grlp
 import emp_mer as emer
 import emp_nys as enys
 
+import thin_pp
+
 d_global = 1
 s_global = 1
 
@@ -53,7 +55,7 @@ def sob(y, s):
 def experiments(
     dim=1,
     smooth=1,
-    times=50,
+    times=20,
     seed=None,
     np_seed=None,
 ):
@@ -72,12 +74,12 @@ def experiments(
     print("seed = {}, np_seed = {}".format(seed, np_seed), file=text_data)
 
     fig = plt.figure()
-    x_ex = [5, 10, 15, 20, 30, 40, 50, 65, 80]
+    x_ex = [4, 8, 16, 32, 64, 128]  # [5, 10, 15, 20, 30, 40, 50, 65, 80]
     m_names = ['N. + emp', 'N. + emp + opt',
-               'Monte Carlo', 'iid Bayes', 'Halton', 'Halton + opt']
+               'Monte Carlo', 'iid Bayes', 'Halton', 'Halton + opt', 'Thinning', 'Thin + opt']
     if dim == 1:
         m_names = ['N. + emp', 'N. + emp + opt', 'M. + emp',
-                   'M. + emp + opt', 'Monte Carlo', 'iid Bayes', 'Uniform Grid']
+                   'M. + emp + opt', 'Monte Carlo', 'iid Bayes', 'Uniform Grid', 'Thinning', 'Thin + opt']
     methods = len(m_names)
     results = [[] for i in range(methods)]
     results_up = [[] for i in range(methods)]
@@ -166,6 +168,12 @@ def func(name, n, rec=0, nys=0):
         x = sampler.random(n)
         w = grlp.QP(k(x, x), k_exp(x), k_exp_exp())
         return x, w
+    elif name == 'Thinning':
+        return ktpp(n, rec)
+    elif name == 'Thin + opt':
+        x, _ = ktpp(n, rec)
+        w = grlp.QP(k(x, x), k_exp(x), k_exp_exp(), nonnegative=True)
+        return x, w
 
 
 def eval(x, w, pr=False):
@@ -206,3 +214,12 @@ def ug_bayes(m, nn=False):
     w = np.array([1 / m for _ in range(m)])
     return pt, w
     # return eval(pt, QP(pt, nn))
+
+
+def ktpp(n, rec):
+    lsize = int(np.floor(np.log2(rec/n) + 1e-5))
+    idx = gen_params(n * int(2 ** lsize))
+    X = idx
+    coreset = thin_pp.main(X, lsize, s_global, name='sob')  # thin_pp
+    m = len(coreset)
+    return idx[coreset], np.ones(m) / m

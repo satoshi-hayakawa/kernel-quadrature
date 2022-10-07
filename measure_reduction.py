@@ -6,6 +6,8 @@ import time
 
 import grlp
 import emp_nys as enys
+import thinning
+import thin_pp
 
 # global
 lam = 1
@@ -33,14 +35,15 @@ def preprocess(data_name):
     np.random.shuffle(data_read)
     global num
     num, dim = data_read.shape
+    print(num)
     if data_name == '3Dnet':
         num = num // 10
     data = data_read[:num, :]
     for i in range(dim):
         data[:, i] = (data[:, i] - np.mean(data[:, i])) / np.std(data[:, i])
-    data_test = data[:, dim-1:dim].reshape((num,))
-    data_t_out = data_test * (data[:, 0:1] >= 0).reshape((num,))
-    data_t_out = data_t_out * (data[:, 1:2] >= 0).reshape((num,))
+    #data_test = data[:, dim-1:dim].reshape((num,))
+    #data_t_out = data_test * (data[:, 0:1] >= 0).reshape((num,))
+    #data_t_out = data_t_out * (data[:, 1:2] >= 0).reshape((num,))
     global lam
     lam = median_heuristics()
     k_exp_comp()
@@ -71,7 +74,7 @@ def k(x, y=0, diag=False, data_k=None, lam_k=None, kernel=None):
 def experiments(
     data_name='3Dnet',
     kernel='Gaussian',
-    times=50,
+    times=20,
     np_seed=None
 ):
     np.random.seed(np_seed)
@@ -83,9 +86,10 @@ def experiments(
     print("np_seed = {}".format(np_seed), file=text_data)
 
     fig = plt.figure()
-    x_ex = [5, 10, 20, 40, 60, 80, 120, 160]
+    x_ex = [4, 8, 16, 32, 64, 128]  # [5, 10, 20, 40]  # , 60, 80, 120, 160]
     m_names = ['N. + emp', 'N. + emp + opt',
-               'Monte Carlo', 'iid Bayes', 'Herding']
+               'Monte Carlo', 'iid Bayes', 'Herding', 'Herd + opt', 'Thinning', 'Thin + opt']
+    #m_names = ['Thinning', 'Monte Carlo']
     methods = len(m_names)
     results = [[] for i in range(methods)]
     results_up = [[] for i in range(methods)]
@@ -149,6 +153,16 @@ def func(name, n, rec=0, nys=0):
         return mc_bayes(n)
     elif name == 'Herding':
         return herding(n)
+    elif name == 'Herd + opt':
+        x, _ = herding(n)
+        w = grlp.QP(k(x, x), k_exp(x), k_exp_exp(), nonnegative=True)
+        return x, w
+    elif name == 'Thinning':
+        return ktpp(n, rec)
+    elif name == 'Thin + opt':
+        x, _ = ktpp(n, rec)
+        w = grlp.QP(k(x, x), k_exp(x), k_exp_exp(), nonnegative=True)
+        return x, w
     else:
         print("There is not such a method")
 
@@ -223,3 +237,12 @@ def herding(m, reweight=False):
         return x, grlp.QP(k(x, x), k_exp(x), k_exp_exp(), nonnegative=True)
     else:
         return x, np.ones(m) / m
+
+
+def ktpp(n, rec):
+    lsize = int(np.floor(np.log2(rec/n) + 1e-5))
+    idx = gen_params(n * int(2 ** lsize))
+    X = data[idx]
+    coreset = thin_pp.main(X, lsize, lam)  # thin_pp
+    m = len(coreset)
+    return idx[coreset], np.ones(m) / m
