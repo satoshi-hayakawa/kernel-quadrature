@@ -1,4 +1,4 @@
-# This repository contains the code used in the paper "Positively Weighted Kernel Quadrature via Subsampling" (https://arxiv.org/abs/2107.09597v3)
+# This repository contains the code used in the paper "Positively Weighted Kernel Quadrature via Subsampling" (NeurIPS2022, https://arxiv.org/abs/2107.09597v3)
 
 ## Python Files
 The python files are written for Pyhon3 and require Gurobi Optimizer (https://www.gurobi.com/). They are divided into three categroires:
