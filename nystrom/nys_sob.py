@@ -10,9 +10,9 @@ import os
 
 from scipy.stats.qmc import Halton
 
-sys.path.append(os.path.abspath(".."))
-import grlp  # noqa
-import thin_pp  # noqa
+# sys.path.append(os.path.abspath(".."))
+# import grlp  # noqa
+# import thin_pp  # noqa
 
 d_global = 1
 s_global = 1
@@ -66,6 +66,10 @@ def sob(y, s):
     if s == 4:
         tmp = 1 - (np.pi ** 8) * 2/315 * (- 1/30 + (x**2) *
                                           (2/3 + (x**2) * (-7/3 + (x**2) * (14/3 - 4*x + x**2))))
+    if s == 6:
+        z = x**2
+        tmp = 1 - (np.pi ** 12) * 4/467775 * (-691/2730 + z * 
+                (5 + z * (-33/2 + z * (22 + z * (-33/2 + z * (11 - 6*x + z))))))
     return np.prod(tmp, axis=-1)
 
 
@@ -91,14 +95,14 @@ def experiments(
 
     fig = plt.figure()
     # , 128]  # [5, 10, 15, 20, 30, 40, 50, 65, 80]
-    x_ex = [4, 8, 16, 32, 64]
-    m_names = ['N. + emp', 'Monte Carlo',
-               'N. + emp + mer', 'N. + emp + mer + sq', 'Halton']
+    x_ex = [4, 8, 16, 32, 64, 128]
+    m_names = ['$k_s^H$', '$k_s^Z$', 'Monte Carlo',
+               '$k_{s,Y}^Z$', '$k_{s,\mu}^Z$', 'Halton']
     # m_names = ['N. + emp', 'N. + emp + opt',
     #            'Monte Carlo', 'iid Bayes', 'Halton', 'Halton + opt', 'Thinning', 'Thin + opt']
     if dim == 1:
-        m_names = ['N. + emp', 'Monte Carlo', 'N. + emp + mer',
-                   'N. + emp + mer + sq', 'Uniform Grid']
+        m_names = ['$k_s^H$', '$k_s^Z$', 'Monte Carlo', '$k_{s,Y}^Z$',
+                   '$k_{s,\mu}^Z$', 'Uniform Grid']
         # m_names = ['N. + emp', 'N. + emp + opt', 'Monte Carlo', 'N. + emp + mer', 'N. + emp + mer + opt',
         #            'iid Bayes', 'Uniform Grid']  # , 'Thinning', 'Thin + opt']
     methods = len(m_names)
@@ -112,7 +116,7 @@ def experiments(
             start_time = time.perf_counter()
             res = np.zeros(times)
             for j in range(times):
-                points, weights = func(m_names[i], n, rec=n*n*n, nys=20*n)
+                points, weights = func(m_names[i], n, rec=n*n, nys=20*n)
                 res[j] = eval(points, weights)
             end_time = time.perf_counter()
             elapsed = (end_time - start_time)/times
@@ -143,7 +147,18 @@ def experiments(
 
 
 def func(name, n, rec=0, nys=0):
-    if name == 'N. + emp':
+    if name == '$k_s^H$':
+        pts_rec = gen_params(rec)
+        if d_global == 1:
+            pts_nys = np.array([[i / n] for i in range(n)])
+        else:
+            sampler = Halton(d=d_global)
+            pts_nys = sampler.random(n)
+        idx, w = enys.recombination(
+            pts_rec, pts_nys, n, use_obj=True, rand_SVD=False)
+        x = pts_rec[idx]
+        return x, w
+    if name == '$k_s^Z$':
         pts_rec = gen_params(rec)
         #pts_nys = gen_params(nys)
         # pts_nys = CUE_seq_generator(nys) # DPP
@@ -152,15 +167,15 @@ def func(name, n, rec=0, nys=0):
             pts_rec, pts_nys, n, use_obj=True, rand_SVD=False)
         x = pts_rec[idx]
         return x, w
-    elif name == 'N. + emp + opt':
+    elif name == '$k_s^Z$ + opt':
         pts_rec = gen_params(rec)
-        pts_nys = gen_params(nys)
+        pts_nys = contaminated(nys, n)
         idx, w = enys.recombination(
             pts_rec, pts_nys, n, use_obj=True, rand_SVD=False)
         x = pts_rec[idx]
         w = grlp.QP(k(x, x), k_exp(x), k_exp_exp(), nonnegative=True)
         return x, w
-    elif name == 'N. + emp + mer':
+    elif name == '$k_{s,Y}^Z$':
         pts_rec = gen_params(rec)
         # pts_nys = gen_params(nys)
         # pts_nys = CUE_seq_generator(nys)
@@ -169,7 +184,17 @@ def func(name, n, rec=0, nys=0):
             pts_rec, pts_nys, n, use_obj=True, rand_SVD=False, mer_kz=True)
         x = pts_rec[idx]
         return x, w
-    elif name == 'N. + emp + mer + sq':
+    elif name == '$k_{s,Y}^Z$ + opt':
+        pts_rec = gen_params(rec)
+        # pts_nys = gen_params(nys)
+        # pts_nys = CUE_seq_generator(nys)
+        pts_nys = contaminated(nys, n)
+        idx, w = enys.recombination(
+            pts_rec, pts_nys, n, use_obj=True, rand_SVD=False, mer_kz=True)
+        x = pts_rec[idx]
+        w = grlp.QP(k(x, x), k_exp(x), k_exp_exp(), nonnegative=True)
+        return x, w
+    elif name == '$k_{s,\mu}^Z$':
         pts_rec = gen_params(rec)
         # pts_nys = gen_params(nys)
         # pts_nys = CUE_seq_generator(nys)
